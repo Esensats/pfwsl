@@ -3,8 +3,15 @@
   A PowerShell script to manage port forwarding rules for WSL 2.
 .DESCRIPTION
   This script allows you to add, remove, replace, and list port forwarding rules for WSL 2.
-  The script uses the Windows Firewall and netsh to manage the port forwarding rules.
-  The script requires administrative privileges to add or remove port forwarding rules.
+  It uses the Windows Firewall and netsh to manage the port forwarding rules.
+  It requires administrator privileges to add or remove port forwarding rules.
+
+  SYNTAX:
+  pfwsl [-c] {add|replace|find} [-p] <port>[,<port>]...
+  pfwsl [-c] {rm} [-p] [<port>[,<port>]...]
+  pfwsl [-c] {ls} [-a]
+  pfwsl [-c] {ip|iprm}
+  pfwsl [-c] {ipset} [-WslIp] <WSL_IP_Address>
 .PARAMETER c
   The command to execute. Valid values are 'add', 'rm', 'replace', 'ls' and 'find'.
   add: Add port forwarding rules.
@@ -46,7 +53,7 @@
   List all firewall rules for ports 8080 and 8081.
 
 .NOTES
-  File Name      : pfw.ps1
+  File Name      : pfwsl.ps1
   Author         : Esensats
   Prerequisite   : Windows 10, Windows Subsystem for Linux 2 (WSL 2)
 
@@ -246,27 +253,35 @@ function Remove-PortForwardFirewallRule {
   )
 
   $resultDisplayName = "$displayName $port";
+
+  $success = $false;
   
   try { 
-    Remove-NetFireWallRule -DisplayName $resultDisplayName -ErrorAction SilentlyContinue;
+    Remove-NetFireWallRule -DisplayName $resultDisplayName -ErrorAction Stop;
+    $success = $true;
   }
   catch {
-    throw "Failed to remove firewall rules: $_"
+    Write-Verbose "Firewall rules could not be removed: $_"
   }
   $null = netsh interface portproxy delete v4tov4 listenport=$port listenaddress=$addr;
   if ($LASTEXITCODE -eq 0) {
     Write-Verbose ("Deleted portproxy rule for port " + $port);
+    $success = $true;
   }
   else {
     Write-Verbose ("No portproxy rule to delete for port " + $port);
   }
-
-  Write-Host "-$resultDisplayName";
+  if ($success) {
+    Write-Host "-$resultDisplayName";
+  }
+  else {
+    Write-Warning "Could not remove port forwarding rule for port $port. It may not exist.";
+  }
 }
 
 function CheckElevated {
   if (-not ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    $PSCmdlet.ThrowTerminatingError([System.Management.Automation.ErrorRecord]::new([System.InvalidOperationException]::new("The Script Exited, Please run the script as an administrator."), "ScriptRequiresElevation", [System.Management.Automation.ErrorCategory]::PermissionDenied, $null))
+    $PSCmdlet.ThrowTerminatingError([System.Management.Automation.ErrorRecord]::new([System.InvalidOperationException]::new("The script exited, please run the script as an administrator."), "ScriptRequiresElevation", [System.Management.Automation.ErrorCategory]::PermissionDenied, $null))
   }
 }
 
