@@ -2,7 +2,7 @@
 .SYNOPSIS
   A PowerShell script to manage Firewall rules for ports.
 .DESCRIPTION
-  This script allows you to add, remove, replace, and list firewall rules for WSL 2.
+  This script allows you to add, remove, replace, and list firewall rules.
   The script uses the Windows Firewall to manage the firewall rules.
   The script requires administrative privileges to add or remove firewall rules.
 .PARAMETER c
@@ -121,7 +121,7 @@ function Get-FirewallTwowayPorts {
   }
 
   # Create an empty array to store the ports
-  $ports = @()
+  $ports = New-Object System.Collections.Generic.HashSet[UInt16]
 
   # Loop through each inbound rule
   foreach ($inboundRule in $inboundRules) {
@@ -140,15 +140,13 @@ function Get-FirewallTwowayPorts {
         $key = "$localPort-$($inboundRule.Protocol)"
         if ($outboundRuleMap.ContainsKey($key)) {
           # If a matching outbound rule is found, add the port to the array
-          $ports += $localPort
+          if ('' -ne $localPort.Trim() -and $null -ne ($localPort -as [UInt16])) {
+            $null = $ports.Add([UInt16]$localPort)
+          }
         }
       }
     }
   }
-
-  # Remove duplicates from the array of ports
-  $ports = $ports | Select-Object -Unique
-
   # Return the array of ports
   return $ports
 }
