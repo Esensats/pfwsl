@@ -20,6 +20,7 @@ It also has multiple bonus features, like searching for all ports that have two-
 - [PFW](#pfw)
 - [Screenshots](#screenshots)
 - [Contribution](#contribution)
+- [Credits](#credits)
 
 ## Installation
 
@@ -130,3 +131,7 @@ Usage is almost the same as `pfwsl`. Use `Get-Help pfw` and `Get-Help pfw -Examp
 
 PowerShell is an interpreted language so it's trivially simple to contribute.
 I welcome all contribution so as always, just make a PR or an issue and I'll review it as soon as I have time.
+
+## Credits
+
+Original idea from [@edwindijas](https://github.com/edwindijas) from [this WSL issue](https://github.com/microsoft/WSL/issues/4150#issuecomment-504209723)
