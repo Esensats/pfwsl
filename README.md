@@ -113,7 +113,7 @@ See [#screenshots](#screenshots) for examples.
   List all firewall rules for ports 8080 and 8081.
 .EXAMPLE
   pfwsl -c ip
-  List all firewall rules for ports 8080 and 8081.
+  Check the WSL IP address the program is using 
 #>
 ```
 
