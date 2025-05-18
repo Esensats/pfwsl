@@ -33,7 +33,7 @@ Launch a terminal as administrator (or use something like [`gsudo`](https://gith
 ```powershell
 pfwsl ls -a # List all ports that have two-way firewall rules.
 pfwsl add 3000 # Add firewall two-way rules and netsh
-               # portproxy rules for ports 8080 and 8081.
+               # portproxy rules for port 3000
 pfwsl rm 3000 # Remove the rule
 pfw add 8080,8081 # Add firewall two-way rules for ports 8080 and 8081.
 
